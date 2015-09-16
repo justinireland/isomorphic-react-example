@@ -1,30 +1,33 @@
 // server.js
 
 var express = require('express'),
-path = require('path'),
-app = express(),
-port = 4444,
-bodyParser = require('body-parser');
+    path = require('path'),
+    bodyParser = require('body-parser'),
+    lessMiddleware = require('less-middleware');
+
+var port = 4444;
+var server = express();
 
 // Make sure to include the JSX transpiler
-require("node-jsx").install();
+require('node-jsx').install();
 
 // Include static assets. Not advised for production
-app.use(express.static(path.join(__dirname, 'public')));
+server.use(express.static(path.join(__dirname, 'public')));
+server.use(lessMiddleware(__dirname + '/public'));
 // Set view path
-app.set('views', path.join(__dirname, 'views'));
+server.set('views', path.join(__dirname, 'views'));
 // set up ejs for templating. You can use whatever
-app.set('view engine', 'ejs');
+server.set('view engine', 'ejs');
 
-// Set up Routes for the application
-require('./app/routes/core-routes.js')(app);
+// Set up Routes
+require('./app/routes/core-routes.js')(server);
 
 //Route not found -- Set 404
-app.get('*', function(req, res) {
+server.get('*', function(req, res) {
     res.json({
         "route": "Sorry this page does not exist!"
     });
 });
 
-app.listen(port);
+server.listen(port);
 console.log('Server is Up and Running at Port : ' + port);
